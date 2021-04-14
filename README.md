@@ -1,4 +1,4 @@
-NestJS기반 게시판 페이지
+NestJS기반 블로그
 ==========
 ### 현재 기능
 * Google OAuth기능
