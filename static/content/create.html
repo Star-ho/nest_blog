@@ -30,38 +30,7 @@
         }
       })
     }
-    (async () =>{
-      fetch("/board/list",{
-        method : "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization" : sessionStorage.getItem('token')
-        }
-        })
-      .then(res=>res.json())
-      .then(res=>{
-        let content_list=$('#content_list')
-        let len=res.length>6?6:res.length;
-        for (let i = 0; i <len ; i++) {
-          let div = $('<div>');
-          let span_title= $('<a>');
-          let span_text= $('<span>');
-          let span_date= $('<span>');
-          span_title.text(res[i].title)
-          span_title.addClass('list_title')
-          span_title.attr('href',`/board/${res[i].id}`)
-
-          span_text.text(res[i].text)
-          span_date.addClass('list_date')
-          span_date.text(''+new Date(res[i].createdAt).getFullYear()+'.'+(new Date(res[i].createdAt).getMonth()+1)+'.'+new Date(res[i].createdAt).getDate())
-          span_text.addClass('list_text')
-          
-          div.append(span_title).append(span_date).append($('</br>')).append($('</br>')).append(span_text)
-
-          content_list.append(div)
-          }
-      })
-    })()
+    
     </script>
       <script>
       (async () => {
@@ -100,13 +69,13 @@
 
     </style>
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="/css/style.css">
   </head>
   <body>
 		<div class="wrapper d-flex align-items-stretch">
 			<nav id="sidebar">
 				<div class="p-4 pt-5">
-		  		<a href="#" class="img logo rounded-circle mb-5" style="background-image: url(images/logo.jpg);"></a>
+		  		<a href="#" class="img logo rounded-circle mb-5" style="background-image: url(/images/logo.jpg);"></a>
 	        <ul class="list-unstyled components mb-5">
 	          <li class="active">
 	            <a href="" style="font-size: 20px;">Home</a>
@@ -129,7 +98,6 @@
               <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"/>
             </svg>
 	        </div>
-
 	      </div>
     	</nav>
         <!-- Page Content  -->
@@ -137,18 +105,19 @@
         <div id='login_wrapper' >
           <div style='width:100%'>
             <div class='btn_group' >
-              <button type="button"  id='login' onClick="location.href='/login.html'" class='button' >로그인</button> 
-              <button type="button"  id='signup' onClick="location.href='/signup.html'" class='button' >회원가입</button>
-              <button type="button"  id='profile' onClick="profile()" class='button' >프로필</button>
-              <button type="button"  id='logout' onClick="logout()" class='button' >로그아웃</button>
-              <button type="button"  onClick="toCreatePage()" class='button' >글쓰기</button>
+                <button type="button" style='width: 110;' id='logout' onClick="createBoard()" class='button' >글쓰기</button>
+                <button type="button" style='width: 60;' id='logout' onclick="location.href='/'" class='button' >취소</button>
             </div>
           </div>
-          <div id="content_list">
-
-          </div>
+          <div style="border: solid #510101 2px;margin-top: 1px;padding: 1%;width: 100%;">
+            <div>
+                <h2 style='width:12%; float:left;' class='h2'>제목</h2>
+                <input type="text" style="float:left;width:50%; height: 10%; "  placeholder="제목을 입력해 주세요" />
+              </div>
+            <textarea id="text" placeholder="내용을 입력해 주세요" style='resize: none;' /></textarea>
+            </div>
           </div>
         </div>
-		</div>
+	</div>
   </body>
 </html>

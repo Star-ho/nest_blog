@@ -5,48 +5,47 @@
     border-bottom-right-radius: 5px; 
     margin: 2px; 
     float: right;
-  } 
+} 
 
-  .btn_group button{ 
+.btn_group button{ 
     border: 1px solid skyblue; 
     background-color: rgba(0,0,0,0); 
     color: skyblue; 
     padding: 5px; 
-  } 
+} 
 
-  .btn_group button:hover{ 
+.btn_group button:hover{ 
     color:white; 
     background-color: skyblue; 
-  }
+}
 
-  #login_wrapper { 
+#login_wrapper { 
     padding: 5px 20px;
-    position: absolute;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 } 
-  .cursor_test {cursor: pointer;}
+.cursor_test {cursor: pointer;}
   table.type07 {
     border-collapse: collapse;
     text-align: left;
     line-height: 1.5;
     border: 1px solid #ccc;
     margin: 20px
-  }
-  table.type07 thead {
+}
+table.type07 thead {
     border-right: 1px solid #ccc;
     border-left: 1px solid #ccc;
     background: #F0F8FF;
-  }
-  table.type07 thead th {
+}
+table.type07 thead th {
     padding: 10px;
     font-weight: bold;
     vertical-align: top;
     border: 1px solid #ccc;
-  }
-  table.type07 tbody th {
+}
+table.type07 tbody th {
     width: 150px;
     padding: 10px;
     font-weight: bold;
@@ -54,13 +53,42 @@
     border-bottom: 1px solid #ccc;
     background: #fcf1f4;
     border: 1px solid #ccc;
-  }
-  table.type07 td {
+}
+table.type07 td {
     width: 350px;
     padding: 10px;
     vertical-align: top;
     border-bottom: 1px solid #ccc;
-  }
-  .changeColor {
+}
+.changeColor {
     background-color: #bff0ff;
-    }
+}
+
+#content_list {
+    border: solid #510101 2px;
+    margin-top: 1px;
+    padding: 1%;
+    width: 100%;
+
+}
+
+#content_list div{
+    width: 100%;
+    padding-right: 2%;
+    padding-left: 1%;
+    border-bottom: solid  #510101 1px;
+}
+
+.list_title {
+    float: left;
+    font-size: x-large;
+}
+
+.list_date {
+    float: right;
+    font-size: medium;
+}
+
+.list_text {
+    font-size: large;
+}

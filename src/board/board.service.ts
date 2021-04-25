@@ -94,7 +94,14 @@ export class BoardService {
     
   //전체 게시글 조회
   async listBoard() {
-    return await this.board.find({ select: ["id","title","createdAt"], order: { createdAt: -1 },take: 6  });
+    let res = await this.board.find({ select: ["id","title","text","createdAt"], order: { createdAt: -1 },take: 6  });
+    res = res.map(v=>{
+      if(v.text.length>=20){
+        v.text=v.text.slice(0,18)+'...'
+      }
+      return v
+    })
+    return res
   }
 
   //하나의 게시글 조회
