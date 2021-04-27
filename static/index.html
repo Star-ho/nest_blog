@@ -8,28 +8,16 @@
     <script src="//code.jquery.com/jquery-3.3.1.js"></script>
     <link rel="stylesheet" href="/css/main.css">   
      <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+
+     <link rel="stylesheet" href="/css/style.css">
     <script>
       function logout(){
         sessionStorage.removeItem('token')
         location.href='/'
         //jwt 제거하는거 요청해야함----------
       }
-      function toCreatePage(){
-        fetch("/profile",{
-          method : "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization" : sessionStorage.getItem('token')
-          }
-          })
-        .then(function (res){
-          if(res.status==200){
-            location.href='/board/create';
-          }else{
-          alert("로그인 해주시기 바랍니다")
-        }
-      })
-    }
+
     (async () =>{
       fetch("/board/list",{
         method : "GET",
@@ -49,8 +37,9 @@
           let span_date= $('<span>');
           span_title.text(res[i].title)
           span_title.addClass('list_title')
-          span_title.attr('href',`/board/${res[i].id}`)
-
+          span_title.attr('data-bs-toggle',"modal")
+          span_title.attr('data-bs-target',"#ViewModal")
+          span_title.attr('onClick',`listOne(${res[i].id})`)
           span_text.text(res[i].text)
           span_date.addClass('list_date')
           span_date.text(''+new Date(res[i].createdAt).getFullYear()+'.'+(new Date(res[i].createdAt).getMonth()+1)+'.'+new Date(res[i].createdAt).getDate())
@@ -77,7 +66,7 @@
           $('#login').remove();
         }else{
           $('#logout').remove();
-          $('#profile').remove()
+          $('#profile').remove();
         }
       })()
         async function profile(){
@@ -96,17 +85,14 @@
         }
 
       </script>
-		<style>
+  
 
-    </style>
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-		<link rel="stylesheet" href="css/style.css">
   </head>
   <body>
 		<div class="wrapper d-flex align-items-stretch">
 			<nav id="sidebar">
 				<div class="p-4 pt-5">
-		  		<a href="#" class="img logo rounded-circle mb-5" style="background-image: url(images/logo.jpg);"></a>
+		  		<a href="#" class="img logo rounded-circle mb-5" style="background-image: url(images/logo.png);"></a>
 	        <ul class="list-unstyled components mb-5">
 	          <li class="active">
 	            <a href="" style="font-size: 20px;">Home</a>
@@ -136,19 +122,389 @@
       <div id="content">
         <div id='login_wrapper' >
           <div style='width:100%'>
-            <div class='btn_group' >
-              <button type="button"  id='login' onClick="location.href='/login.html'" class='button' >로그인</button> 
-              <button type="button"  id='signup' onClick="location.href='/signup.html'" class='button' >회원가입</button>
+            <div class='btn_group' style="float: right;" >
+              <button type="button"  data-bs-toggle="modal" data-bs-target="#signupModal" class='button' id="signup" >회원가입</button>
               <button type="button"  id='profile' onClick="profile()" class='button' >프로필</button>
               <button type="button"  id='logout' onClick="logout()" class='button' >로그아웃</button>
-              <button type="button"  onClick="toCreatePage()" class='button' >글쓰기</button>
+              <button type="button"  data-bs-toggle="modal" data-bs-target="#loginModal" class='button' id="login" >로그인</button>
+              <button type="button"  data-bs-toggle="modal" data-bs-target="#writeModal" class='button' id="write" onClick='createAuth()' >글쓰기</button>
             </div>
           </div>
           <div id="content_list">
 
           </div>
-          </div>
         </div>
 		</div>
+
+
+
+    <!--게시판 생성 모달-->
+    <div class="modal fade" id="writeModal" tabindex="-1" aria-labelledby="writeModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="title" >글쓰기</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="recipient-name" class="col-form-label">제목:</label>
+                <input type="text" class="form-control" id="boardTitle">
+              </div>
+              <div class="mb-3">
+                <label for="message-text" class="col-form-label">내용:</label>
+                <textarea class="form-control" style="min-height :calc(15.5em + .75rem + 2px)" id="boardText"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="button" class="btn btn-primary" onClick='createBoard()' >글쓰기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--게시판 수정 모달-->
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="writeModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="title" >수정</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="recipient-name" class="col-form-label">제목:</label>
+                <input type="text" class="form-control" id="updateBoardTitle">
+              </div>
+              <div class="mb-3">
+                <label for="message-text" class="col-form-label">내용:</label>
+                <textarea class="form-control" style="min-height :calc(15.5em + .75rem + 2px)" id="updateBoardText"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="button" class="btn btn-primary" onClick='UpdateContents()'>수정</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--게시글 조회 모달-->
+    <div class="modal fade" id="ViewModal" tabindex="-1" aria-labelledby="ViewModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="title"  >게시글</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div style="padding: 0px 0px 0px;">
+                <p style="font-size:xx-large;padding: 0px 0px 0px;" for="recipient-name" class="col-form-label" id="content_title"></label>
+              </div>
+              <div class="mb-3" style="border-bottom: solid;padding-bottom: 2.5rem; padding-top: 0;">
+                <p style="font-size:large; float: left; padding-top: 0;" for="recipient-name" class="col-form-label" id="content_username"></label>
+
+                <p style="font-size:large; float:right" for="recipient-name" class="col-form-label" id="content_date"></label>
+              </div>
+              <div class="mb-3">
+                <p style="font-size:x-large;word-break: break-all;" for="message-text" class="col-form-label" id="content_text"></label>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button"  data-bs-toggle="modal" data-bs-target="#updateModal" class='btn btn-primary' id="write" data-bs-dismiss="modal" onClick='loadUpdateContents()' >수정</button>
+            <button type="button" class="btn btn-primary" onClick='deleteContents()' >삭제</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--로그인 모달-->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="title" >로그인</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="recipient-name" class="col-form-label">아이디:</label>
+                <input type="text" class="form-control" id="id">
+              </div>
+              <div class="mb-3">
+                <label for="message-text" class="col-form-label">비밀번호:</label>
+                <input type="password" class="form-control" id="pw">
+
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="button" class="btn btn-primary" onClick="location.href='/auth/login/google'" class='button' >구글로그인</button>
+            <button type="button" class="btn btn-primary" onClick='login()'>로그인</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--회원가입 모달-->
+    <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="title" >회원가입</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="recipient-name" class="col-form-label">아이디:</label>
+                <input type="text" class="form-control" id="signup_id">
+              </div>
+              <div class="mb-3">
+                <label for="message-text" class="col-form-label">비밀번호:</label>
+                <input type="password" class="form-control" id="signup_pw">
+              </div>
+              <div class="mb-3">
+                <label for="message-text" class="col-form-label">사용자 이름:</label>
+                <input type="text" class="form-control" id="signup_username">
+              </div>              
+              <div class="mb-3">
+                <label for="message-text" class="col-form-label">이메일:</label>
+                <input type="text" class="form-control" id="signup_email">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="button" class="btn btn-primary" onClick='signup()'>회원가입</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let curContents;
+      function login(){
+        let id = document.getElementById("id").value;
+        let pw = document.getElementById("pw").value;
+        fetch("/auth/login",{
+            method : "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body:JSON.stringify({
+            "id":id,
+            "password":pw
+        }),
+      })
+      .then(res=>res.json())
+      .then(res=>{
+        if(res.success){
+          sessionStorage.setItem("token",res.token);
+          alert("로그인성공");
+          location.href='/board';
+          }else{
+            alert("id와 비밀번호를 확인해 주시기 바랍니다");
+          }
+        })
+      }
+      function createAuth(){
+      fetch("/profile",{
+            method : "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization" : sessionStorage.getItem('token')
+          },
+          }).then(res=>res.json())
+          .then(res=>{
+            if(res.username){
+            }else{
+              alert("로그인이 필요합니다")
+              location.href='/'
+          }
+        })
+      }
+      function createBoard(title,text){
+        var title =  document.getElementById("boardTitle").value;
+        var text = document.getElementById("boardText").value;
+        if( title ==''){
+        alert("제목을 입력해 주세요");
+        return;
+      }
+      if( text ==''){
+        alert("내용을 입력해 주세요");
+        return;
+      }
+      fetch("/board/create",{
+          method : "Put",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization" : sessionStorage.getItem("token")
+          },
+          body:JSON.stringify({
+          "title":title,
+          "text":text
+      }),
+    })
+    .then(res=>res.json())
+    .then(res=>{
+      if(res.id){
+        alert("게시글이 작성되었습니다")
+        location.href='/'
+        }
+      })
+    
+      }
+
+        function signup(){
+          let id = document.getElementById("signup_id").value;
+          let pw = document.getElementById("signup_pw").value;
+          let username = document.getElementById("signup_username").value;
+          let email = document.getElementById("signup_email").value;
+  
+          if( id ==''){
+            alert("아이디를 입력해 주세요");
+            return;
+          }
+          if( pw ==''){
+            alert("비밀번호를 입력해 주세요");
+            return;
+          }
+          if( username ==''){
+            alert("사용자 이름을 입력해 주세요");
+            return;
+          }
+          fetch("/users/signup",{
+              method : "Put",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+              id: id,
+              username: username,
+              password: pw,
+              email:email
+            }),
+          })
+          .then(res=>res.json())
+          .then(res=>{
+            if(res.identifedNumber){
+              alert("회원가입 성공")
+              location.href='/'
+            }
+            else if(res.msg){
+              alert(res.msg);
+            }else{
+              alert('다시시도해주세요')
+            }
+          })
+        }
+
+        function listOne(id){
+          curContents=id
+          let title = document.getElementById("content_title");
+          let text = document.getElementById("content_text");
+          let date = document.getElementById("content_date");
+          let username = document.getElementById("content_username");
+          fetch(`/board/${id}`,{
+              method : "GET",
+          })
+          .then(res=>res.json())
+          .then(res=>{
+            title.innerHTML=res.title
+            text.innerHTML=res.text
+            username.innerHTML='작성자 : '+res.username
+            date.innerHTML=''+new Date(res.date).getFullYear()+'.'+(new Date(res.date).getMonth()+1)+'.'+new Date(res.date).getDate()
+          })
+        }
+        function deleteContents(){
+          fetch(`/board/delete/${curContents}`,{
+            method : "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization" : sessionStorage.getItem('token')
+            }
+          })
+        .then(function (res){
+          if(res.status==200){
+            alert("삭제 성공")
+            location.href='/';
+          }else{
+          alert("작성자만 삭제 가능합니다")
+          location.href='/';
+        }
+        })
+      }
+      function loadUpdateContents(){
+          let title = document.getElementById("updateBoardTitle");
+          let text = document.getElementById("updateBoardText");
+
+          fetch(`/board/update/${curContents}`,{
+              method : "Get",
+              headers: {
+              "Authorization" : sessionStorage.getItem('token')
+            }
+          })
+          .then(res=>res.json())
+          .then(res=>{
+              if(res.title){
+                title.value=res.title
+                text.value=res.text
+              }else{
+              alert("작성자만 수정 가능합니다")
+              location.href='/';
+            }
+
+          })
+      }
+      function UpdateContents(){
+        let title = document.getElementById("updateBoardTitle").value;
+        let text = document.getElementById("updateBoardText").value;
+        if( title ==''){
+          alert("제목을 입력해 주세요");
+          return;
+        }
+        if( text ==''){
+          alert("내용을 입력해 주세요");
+          return;
+        }
+        fetch(`/board/update/${curContents}`,{
+            method : "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization" : sessionStorage.getItem("token")
+            },
+            body:JSON.stringify({
+            "title":title,
+            "text":text
+        }),
+      })
+      .then(res=>{
+        console.log(res)
+        console.log(res.status)
+
+        if(res.status===200){
+          alert("게시글이 수정되었습니다")
+          location.href='/'
+        }else{
+          alert("게시글은 작성자만 수정이 가능합니다");
+          location.href='/';
+        }
+        })
+      }
+      </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
   </body>
 </html>

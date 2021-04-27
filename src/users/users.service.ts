@@ -18,12 +18,12 @@ export class UsersService {
       return JSON.stringify({ msg: "id를 입력해주세요" })
     if(!("username" in signupUser)) 
       return JSON.stringify({ msg: "username를 입력해주세요" })
-    console.log(signupUser.id)
     if(await this.findOne(signupUser.id))
       return JSON.stringify({ msg: "id 가 중복됩니다." })
     if(await this.findByUsername(signupUser.username))
       return JSON.stringify({ msg: "username이 중복됩니다." })
-    if(await this.findByEmail(signupUser.email))
+    let email=await this.findByEmail(signupUser.email)
+    if(email&&email.email!='')
       return JSON.stringify({ msg: "email이 중복됩니다." })
   
     signupUser.password = await bcrypt.hash(signupUser.password, 10);//비밀번호 암호화

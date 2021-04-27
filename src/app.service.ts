@@ -6,7 +6,6 @@ import { AuthService } from './auth/auth.service';
 export class AppService {
   constructor(private authService: AuthService){}
      async googleLogin(req) {
-      console.log(req.user,23)
       if (req.user=='fail') {
         return `<html><body>
         <script>

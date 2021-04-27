@@ -1,4 +1,4 @@
-import { Controller, Put, Body, Patch, Get, Param, UseGuards,Request, Delete } from "@nestjs/common";
+import { Controller, Put, Body, Patch, Get, Param, UseGuards,Request, Delete, Query } from "@nestjs/common";
 import Board from "../entity/board.entity";
 import { BoardService } from "./board.service";
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -14,11 +14,6 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
     return this.boardService.listBoard();;
   }
     
-  @Get("create")//게시글 생성 페이지
-  async createboard() {
-    const ret = await this.boardService.createboard();
-    return ret;
-  }
   //게시글 생성
   @UseGuards(JwtAuthGuard)
   @Put("create")
@@ -29,20 +24,22 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
   //id에 해당하는 게시글 조회
   @Get(":id")
-  async detail(@Param("id") boardId: number) {
-    return await this.boardService.detailBoard(boardId);
+  detail(@Param("id") boardId: number) {
+    return this.boardService.detailBoard(boardId);
   }
 
   //id에 해당하는 게시글 업데이트, jwt로 인증하여 IdentificationNuber가 같아야 변경가능
+  @UseGuards(JwtAuthGuard)
   @Get("update/:id")
-  async updateboard(@Param("id") boardId: number) {
-    const ret = await this.boardService.updateBoardPage(boardId);
+  async updateboard(@Request() req,@Param("id") boardId: number) {
+    const ret = await this.boardService.updateBoardAuth(req.user,boardId);
     return ret;
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch("update/:id")
   async update(@Request() req,@Param("id") boardId: number,@Body() updateData: Board) {
+    console.log(123)
     const ret = await this.boardService.updateBoard(req.user,boardId,updateData);
     return ret;
   }
